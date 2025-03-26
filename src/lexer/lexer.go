@@ -41,7 +41,6 @@ func (lex *lexer) at_eof() bool {
 
 func Tokenize(source string) []Token {
 	lex := createLexer(source)
-	// iterate over the source until we reach the end
 	for !lex.at_eof() {
 		matched := false
 		for _, pattern := range lex.patterns {
@@ -57,7 +56,6 @@ func Tokenize(source string) []Token {
 			panic(fmt.Sprintf("Lexer::Error -> unrecognized token near %s\n", lex.remainder()))
 		}
 	}
-
 	lex.push(NewToken(EOF, "EOF"))
 	return lex.Tokens
 }
@@ -68,7 +66,7 @@ func createLexer(source string) *lexer {
 		source: source,
 		Tokens: make([]Token, 0),
 		patterns: []regexPattern{
-			// {regexp.MustCompile(`\s+`), skipHandler},
+			{regexp.MustCompile(`\s+`), skipHandler},
 			// {regexp.MustCompile(`\/\/.*`), commentHandler},
 			// {regexp.MustCompile(`"[^"]*"`), stringHandler},
 			{regexp.MustCompile(`[0-9]+(\.[0-9]+)?`), numberHandler},
@@ -115,6 +113,11 @@ func defaultHandler(kind TokenKind, value string) regexHandler {
 		lex.advanceN(len(value))
 		lex.push(NewToken(kind, value))
 	}
+}
+
+func skipHandler(lex *lexer, regex *regexp.Regexp) {
+	match := regex.FindStringIndex(lex.remainder())
+	lex.advanceN(match[1])
 }
 
 func numberHandler(lex *lexer, regex *regexp.Regexp) {

@@ -1,6 +1,9 @@
 package lexer
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type TokenKind int
 
@@ -79,34 +82,6 @@ const (
 	// Misc
 	NUM_TOKENS
 )
-
-type Token struct {
-	Kind  TokenKind
-	Value string
-}
-
-func (token Token) isOneOfMany(expectedTokens ...TokenKind) bool {
-	for _, expected := range expectedTokens {
-		if expected == token.Kind {
-			return true
-		}
-	}
-	return false
-}
-
-func (token Token) Debug() {
-	if token.isOneOfMany(IDENTIFIER, NUMBER, STRING) {
-		fmt.Printf("%s (%s)\n", TokenKindString(token.Kind), token.Value)
-	} else {
-		fmt.Printf("%s\n", TokenKindString(token.Kind))
-	}
-}
-
-func NewToken(kind TokenKind, value string) Token {
-	return Token{
-		kind, value,
-	}
-}
 
 func TokenKindString(kind TokenKind) string {
 	switch kind {
@@ -218,5 +193,28 @@ func TokenKindString(kind TokenKind) string {
 		return "in"
 	default:
 		return fmt.Sprintf("unknown(%d)", kind)
+	}
+}
+
+type Token struct {
+	Kind  TokenKind
+	Value string
+}
+
+func (token Token) isOneOfMany(expectedTokens ...TokenKind) bool {
+	return slices.Contains(expectedTokens, token.Kind)
+}
+
+func (token Token) Debug() {
+	if token.isOneOfMany(IDENTIFIER, NUMBER, STRING) {
+		fmt.Printf("%s(%s)\n", TokenKindString(token.Kind), token.Value)
+	} else {
+		fmt.Printf("%s()\n", TokenKindString(token.Kind))
+	}
+}
+
+func NewToken(kind TokenKind, value string) Token {
+	return Token{
+		kind, value,
 	}
 }
