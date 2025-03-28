@@ -196,6 +196,27 @@ func TokenKindString(kind TokenKind) string {
 	}
 }
 
+var reserved_lu map[string]TokenKind = map[string]TokenKind{
+	"true":    TRUE,
+	"false":   FALSE,
+	"null":    NULL,
+	"let":     LET,
+	"const":   CONST,
+	"class":   CLASS,
+	"new":     NEW,
+	"import":  IMPORT,
+	"from":    FROM,
+	"fn":      FN,
+	"if":      IF,
+	"else":    ELSE,
+	"foreach": FOREACH,
+	"while":   WHILE,
+	"for":     FOR,
+	"export":  EXPORT,
+	"typeof":  TYPEOF,
+	"in":      IN,
+}
+
 type Token struct {
 	Kind  TokenKind
 	Value string
